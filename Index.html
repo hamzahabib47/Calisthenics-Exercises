@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CALISTHENICS CODEX</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --card: #16161f;
+    --border: #1e1e2e;
+    --text: #e8e8f0;
+    --muted: #5a5a7a;
+    --int: #00e5a0;
+    --adv: #ff6b35;
+    --eli: #c040fb;
+    --accent: #ffe135;
+    --int-bg: rgba(0,229,160,0.08);
+    --adv-bg: rgba(255,107,53,0.08);
+    --eli-bg: rgba(192,64,251,0.08);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    padding: 60px 24px 40px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(192,64,251,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(56px, 12vw, 110px);
+    letter-spacing: 6px;
+    line-height: 0.9;
+    background: linear-gradient(135deg, #fff 0%, #c040fb 50%, #ff6b35 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  .hero-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat-n {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    line-height: 1;
+  }
+  .stat-n.int { color: var(--int); }
+  .stat-n.adv { color: var(--adv); }
+  .stat-n.eli { color: var(--eli); }
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* FILTERS */
+  .filters-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .filters-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .filter-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .filter-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    align-self: center;
+    min-width: 40px;
+  }
+  .chip {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .chip:hover { border-color: var(--text); color: var(--text); }
+  .chip.active-all { background: var(--accent); border-color: var(--accent); color: #000; }
+  .chip.active-int { background: var(--int); border-color: var(--int); color: #000; }
+  .chip.active-adv { background: var(--adv); border-color: var(--adv); color: #000; }
+  .chip.active-eli { background: var(--eli); border-color: var(--eli); color: #000; }
+  .chip.active-body { background: var(--text); border-color: var(--text); color: #000; }
+
+  /* SEARCH */
+  .search-wrap {
+    position: relative;
+  }
+  .search-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 8px 12px 8px 32px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--muted); }
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  /* GRID */
+  .grid-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+  .count-line {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+  .count-line span { color: var(--accent); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    cursor: default;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .card.int::before { background: var(--int); }
+  .card.adv::before { background: var(--adv); }
+  .card.eli::before { background: var(--eli); }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .card.int:hover { border-color: rgba(0,229,160,0.3); box-shadow: 0 8px 32px rgba(0,229,160,0.08); }
+  .card.adv:hover { border-color: rgba(255,107,53,0.3); box-shadow: 0 8px 32px rgba(255,107,53,0.08); }
+  .card.eli:hover { border-color: rgba(192,64,251,0.3); box-shadow: 0 8px 32px rgba(192,64,251,0.08); }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    gap: 8px;
+  }
+  .card-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    flex-shrink: 0;
+    line-height: 1;
+    margin-top: 2px;
+  }
+  .badge-row {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+    font-weight: 700;
+  }
+  .badge.int { background: var(--int-bg); color: var(--int); border: 1px solid rgba(0,229,160,0.25); }
+  .badge.adv { background: var(--adv-bg); color: var(--adv); border: 1px solid rgba(255,107,53,0.25); }
+  .badge.eli { background: var(--eli-bg); color: var(--eli); border: 1px solid rgba(192,64,251,0.25); }
+  .badge-body {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.05);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .card-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 1px;
+    line-height: 1.1;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+  .card-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .card-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .meta-key {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .meta-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text);
+  }
+
+  .card-icon {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    font-size: 28px;
+    opacity: 0.12;
+  }
+
+  /* EMPTY */
+  .empty {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 60px 20px;
+    font-family: 'Space Mono', monospace;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 32px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+    .stats-row { gap: 20px; }
+    .filter-label { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">⬡ The Complete Guide ⬡</div>
+  <h1>CALISTHENICS<br>CODEX</h1>
+  <div class="hero-sub">50 EXERCISES · FULL BODY · 3 TIERS</div>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-n int">18</div><div class="stat-label">Intermediate</div></div>
+    <div class="stat"><div class="stat-n adv">17</div><div class="stat-label">Advanced</div></div>
+    <div class="stat"><div class="stat-n eli">15</div><div class="stat-label">Elite</div></div>
+  </div>
+</div>
+
+<div class="filters-wrap">
+  <div class="filters-inner">
+    <div class="filter-row">
+      <div class="filter-label">Level</div>
+      <button class="chip active-all" data-level="all">All</button>
+      <button class="chip" data-level="intermediate">Intermediate</button>
+      <button class="chip" data-level="advanced">Advanced</button>
+      <button class="chip" data-level="elite">Elite</button>
+    </div>
+    <div class="filter-row">
+      <div class="filter-label">Muscle</div>
+      <button class="chip" data-body="all">All</button>
+      <button class="chip" data-body="chest">Chest</button>
+      <button class="chip" data-body="back">Back</button>
+      <button class="chip" data-body="shoulders">Shoulders</button>
+      <button class="chip" data-body="arms">Arms</button>
+      <button class="chip" data-body="core">Core</button>
+      <button class="chip" data-body="legs">Legs</button>
+      <button class="chip" data-body="full body">Full Body</button>
+    </div>
+    <div class="search-wrap">
+      <div class="search-icon">⌕</div>
+      <input class="search-input" type="text" id="searchInput" placeholder="Search exercises...">
+    </div>
+  </div>
+</div>
+
+<div class="grid-wrap">
+  <div class="count-line" id="countLine"><span id="countNum">50</span> exercises shown</div>
+  <div class="grid" id="exerciseGrid"></div>
+</div>
+
+<footer>CALISTHENICS CODEX — MASTER YOUR BODYWEIGHT</footer>
+
+<script>
+const exercises = [
+  // ─── INTERMEDIATE ───
+  { id:1, name:"Diamond Push-Up", level:"intermediate", body:"chest", sets:"4×12", rest:"60s", icon:"💎", desc:"Hands form a diamond shape to target the inner chest and triceps with precision." },
+  { id:2, name:"Wide Push-Up", level:"intermediate", body:"chest", sets:"4×15", rest:"60s", icon:"✋", desc:"Wider hand placement shifts load to the outer pecs and anterior deltoids." },
+  { id:3, name:"Decline Push-Up", level:"intermediate", body:"chest", sets:"4×12", rest:"60s", icon:"📐", desc:"Feet elevated to increase upper-chest activation and shoulder engagement." },
+  { id:4, name:"Australian Pull-Up", level:"intermediate", body:"back", sets:"4×12", rest:"60s", icon:"🦅", desc:"Horizontal row under a low bar — foundational for scapular retraction strength." },
+  { id:5, name:"Chin-Up", level:"intermediate", body:"back", sets:"4×8", rest:"90s", icon:"💪", desc:"Underhand grip maximises bicep contribution while building solid lat width." },
+  { id:6, name:"Neutral-Grip Pull-Up", level:"intermediate", body:"back", sets:"4×8", rest:"90s", icon:"🤜", desc:"Parallel handles reduce shoulder stress, ideal for joint-friendly pulling volume." },
+  { id:7, name:"Pike Push-Up", level:"intermediate", body:"shoulders", sets:"4×10", rest:"60s", icon:"🔺", desc:"Inverted V position transfers push-up force to the deltoids — gateway to HSPU." },
+  { id:8, name:"Lateral Raises (Calisthenics)", level:"intermediate", body:"shoulders", sets:"3×15", rest:"45s", icon:"🕊️", desc:"Use a wall or backpack for resistance; isolates medial delts for shoulder width." },
+  { id:9, name:"Bench Dip", level:"intermediate", body:"arms", sets:"4×15", rest:"60s", icon:"🪑", desc:"Tricep dip on a flat surface; feet elevated to increase load and ROM." },
+  { id:10, name:"Close-Grip Push-Up", level:"intermediate", body:"arms", sets:"4×12", rest:"60s", icon:"🤲", desc:"Hands shoulder-width or narrower — supreme tricep builder with minimal equipment." },
+  { id:11, name:"Leg Raise", level:"intermediate", body:"core", sets:"4×15", rest:"45s", icon:"🦵", desc:"Hanging or lying — targets lower abs and hip flexors through full pelvic tilt." },
+  { id:12, name:"Hollow Body Hold", level:"intermediate", body:"core", sets:"4×30s", rest:"30s", icon:"🌙", desc:"The foundational gymnastics position that activates your entire anterior chain." },
+  { id:13, name:"Dragon Flag (Tuck)", level:"intermediate", body:"core", sets:"3×8", rest:"90s", icon:"🐉", desc:"Tuck version of the famous Bruce Lee move; trains the spine like nothing else." },
+  { id:14, name:"Pistol Squat Assisted", level:"intermediate", body:"legs", sets:"3×8", rest:"90s", icon:"🎯", desc:"Single-leg squat with TRX/pole support; builds balance and unilateral strength." },
+  { id:15, name:"Bulgarian Split Squat", level:"intermediate", body:"legs", sets:"4×10", rest:"75s", icon:"🏔️", desc:"Rear foot elevated; devastates quads, glutes, and hip flexors simultaneously." },
+  { id:16, name:"Nordic Curl", level:"intermediate", body:"legs", sets:"3×6", rest:"120s", icon:"❄️", desc:"Arguably the best bodyweight hamstring exercise ever studied in sports science." },
+  { id:17, name:"L-Sit (Floor)", level:"intermediate", body:"core", sets:"4×20s", rest:"60s", icon:"📐", desc:"Parallel bar or floor L-sit; compresses the hip flexors and builds rigid core tension." },
+  { id:18, name:"Archer Push-Up", level:"intermediate", body:"chest", sets:"3×8", rest:"90s", icon:"🏹", desc:"One arm straightens as you lower — a stepping stone to the one-arm push-up." },
+
+  // ─── ADVANCED ───
+  { id:19, name:"Weighted Pull-Up", level:"advanced", body:"back", sets:"5×5", rest:"180s", icon:"⚖️", desc:"Add a weight belt or vest; forces progressive overload on the lats and biceps." },
+  { id:20, name:"Typewriter Pull-Up", level:"advanced", body:"back", sets:"4×6", rest:"120s", icon:"⌨️", desc:"At the top, slide laterally side to side — brutal unilateral lat and rotator work." },
+  { id:21, name:"Ring Row (Advanced)", level:"advanced", body:"back", sets:"4×10", rest:"90s", icon:"⭕", desc:"Feet elevated, rings close to chest — approaches horizontal row with full instability." },
+  { id:22, name:"Pseudo Planche Push-Up", level:"advanced", body:"chest", sets:"4×8", rest:"120s", icon:"🤸", desc:"Fingers pointing back, lean forward — activates anterior deltoids and serratus." },
+  { id:23, name:"Chest-to-Bar Pull-Up", level:"advanced", body:"back", sets:"4×6", rest:"120s", icon:"🎯", desc:"Pull high enough that your chest contacts the bar — extraordinary lat density builder." },
+  { id:24, name:"Handstand Push-Up", level:"advanced", body:"shoulders", sets:"4×5", rest:"180s", icon:"🤸", desc:"Wall-supported inversion press; maximum overhead strength with just your bodyweight." },
+  { id:25, name:"Straddle Planche (Lean)", level:"advanced", body:"shoulders", sets:"4×10s", rest:"120s", icon:"✈️", desc:"Lean forward into planche position with legs straddled; enormous anterior delt demand." },
+  { id:26, name:"Ring Dip", level:"advanced", body:"chest", sets:"4×8", rest:"120s", icon:"🔵", desc:"Gymnastics rings create constant instability; massive pec and tricep stabiliser demand." },
+  { id:27, name:"Dragon Flag (Full)", level:"advanced", body:"core", sets:"4×6", rest:"120s", icon:"🐲", desc:"Full-body straight lever off a bench — total anterior chain tension from neck to ankle." },
+  { id:28, name:"Human Flag (Tuck)", level:"advanced", body:"full body", sets:"3×5s", rest:"180s", icon:"🚩", desc:"Tuck version of the iconic side lever; requires immense lateral chain and shoulder strength." },
+  { id:29, name:"One-Arm Push-Up", level:"advanced", body:"chest", sets:"4×5", rest:"180s", icon:"☝️", desc:"One arm tucked behind — demands full-body tension and anti-rotation core stability." },
+  { id:30, name:"Pistol Squat (Full)", level:"advanced", body:"legs", sets:"4×6", rest:"120s", icon:"🔫", desc:"Unassisted single-leg squat to full depth; the gold standard of bodyweight leg strength." },
+  { id:31, name:"Shrimp Squat", level:"advanced", body:"legs", sets:"4×6", rest:"120s", icon:"🦐", desc:"Rear foot held in hand while squatting; challenges balance and quad through extreme ROM." },
+  { id:32, name:"Back Lever", level:"advanced", body:"back", sets:"3×8s", rest:"180s", icon:"🔙", desc:"Horizontal hold facing down on rings — develops posterior chain and shoulder integrity." },
+  { id:33, name:"Muscle-Up (Bar)", level:"advanced", body:"full body", sets:"4×4", rest:"180s", icon:"💥", desc:"Pull-up transitioning into a dip above the bar — explosive and technical compound movement." },
+  { id:34, name:"Pike Push-Up (Elevated)", level:"advanced", body:"shoulders", sets:"4×10", rest:"90s", icon:"⬆️", desc:"Feet on a box in full pike; nearly identical loading pattern to a handstand push-up." },
+  { id:35, name:"Windshield Wiper", level:"advanced", body:"core", sets:"3×8", rest:"120s", icon:"🌀", desc:"Hanging from bar, rotate legs side to side through full ROM; elite oblique builder." },
+
+  // ─── ELITE ───
+  { id:36, name:"Planche", level:"elite", body:"full body", sets:"3×5s", rest:"240s", icon:"🛸", desc:"Both hands support the entire body horizontally — peak strength-to-weight ratio movement." },
+  { id:37, name:"Front Lever", level:"elite", body:"back", sets:"3×5s", rest:"240s", icon:"⚡", desc:"Horizontal hold facing up on rings or bar — the pinnacle of lat and core integration." },
+  { id:38, name:"Human Flag (Full)", level:"elite", body:"full body", sets:"3×3s", rest:"300s", icon:"🏴", desc:"Full straight-body side lever — perhaps the most impressive relative-strength display." },
+  { id:39, name:"One-Arm Pull-Up", level:"elite", body:"back", sets:"3×3", rest:"300s", icon:"☝️", desc:"Single arm raises the entire bodyweight — requires years of pulling strength accumulation." },
+  { id:40, name:"One-Arm Handstand", level:"elite", body:"shoulders", sets:"3×3s", rest:"300s", icon:"🌟", desc:"Free-standing single-arm balance; the apex of shoulder strength and proprioception." },
+  { id:41, name:"Ring Muscle-Up", level:"elite", body:"full body", sets:"4×3", rest:"240s", icon:"💫", desc:"Transitioning above the rings requires explosive pulling and extreme shoulder stability." },
+  { id:42, name:"Straddle Planche Push-Up", level:"elite", body:"chest", sets:"3×4", rest:"300s", icon:"🚀", desc:"Full planche position push-ups — less than 0.1% of trainees ever achieve this." },
+  { id:43, name:"Iron Cross", level:"elite", body:"full body", sets:"3×3s", rest:"300s", icon:"✝️", desc:"Arms extended laterally on rings holding bodyweight — extraordinary pec and delt strength." },
+  { id:44, name:"HSPU (Free Standing)", level:"elite", body:"shoulders", sets:"3×3", rest:"240s", icon:"🤯", desc:"Handstand push-up without wall support — requires perfect balance and overhead strength." },
+  { id:45, name:"90° Push-Up", level:"elite", body:"full body", sets:"3×3", rest:"300s", icon:"🔬", desc:"Push-up balancing on fists with legs raised — combines planche and pressing strength." },
+  { id:46, name:"Victorian Cross", level:"elite", body:"full body", sets:"2×3s", rest:"300s", icon:"👑", desc:"Rings beside hips with body inclined back; rarest gymnastics ring skill outside competition." },
+  { id:47, name:"Manna", level:"elite", body:"core", sets:"3×3s", rest:"300s", icon:"☁️", desc:"Seated on hands with hips rising above shoulders — extreme hip flexor and core compression." },
+  { id:48, name:"Full Lay Planche", level:"elite", body:"full body", sets:"3×3s", rest:"300s", icon:"🛩️", desc:"Body fully horizontal, legs together — the final form of the planche progression." },
+  { id:49, name:"One-Arm Front Lever", level:"elite", body:"back", sets:"2×3s", rest:"300s", icon:"🌠", desc:"Single arm front lever — combines OAP pulling strength with front lever stability." },
+  { id:50, name:"Aztec Push-Up", level:"elite", body:"full body", sets:"3×3", rest:"300s", icon:"🌋", desc:"Explosive push-up launching body vertically with arms and legs simultaneously leaving ground." },
+];
+
+let activeLevel = 'all';
+let activeBody = 'all';
+let searchQuery = '';
+
+const levelChips = document.querySelectorAll('[data-level]');
+const bodyChips = document.querySelectorAll('[data-body]');
+const searchInput = document.getElementById('searchInput');
+const grid = document.getElementById('exerciseGrid');
+const countNum = document.getElementById('countNum');
+
+function lvlClass(l) {
+  if (l === 'intermediate') return 'int';
+  if (l === 'advanced') return 'adv';
+  if (l === 'elite') return 'eli';
+}
+
+function render() {
+  const filtered = exercises.filter(e => {
+    const lvlOk = activeLevel === 'all' || e.level === activeLevel;
+    const bodyOk = activeBody === 'all' || e.body === activeBody;
+    const q = searchQuery.toLowerCase();
+    const searchOk = !q || e.name.toLowerCase().includes(q) || e.desc.toLowerCase().includes(q) || e.body.includes(q) || e.level.includes(q);
+    return lvlOk && bodyOk && searchOk;
+  });
+
+  countNum.textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty">NO EXERCISES MATCH YOUR FILTERS</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(e => {
+    const lc = lvlClass(e.level);
+    return `
+    <div class="card ${lc}">
+      <div class="card-top">
+        <div class="card-num">#${String(e.id).padStart(2,'0')}</div>
+        <div class="badge-row">
+          <span class="badge ${lc}">${e.level}</span>
+          <span class="badge-body">${e.body}</span>
+        </div>
+      </div>
+      <div class="card-name">${e.name}</div>
+      <div class="card-desc">${e.desc}</div>
+      <div class="card-meta">
+        <div class="meta-item"><div class="meta-key">Sets×Reps</div><div class="meta-val">${e.sets}</div></div>
+        <div class="meta-item"><div class="meta-key">Rest</div><div class="meta-val">${e.rest}</div></div>
+      </div>
+      <div class="card-icon">${e.icon}</div>
+    </div>`;
+  }).join('');
+}
+
+levelChips.forEach(chip => {
+  chip.addEventListener('click', () => {
+    activeLevel = chip.dataset.level;
+    levelChips.forEach(c => {
+      c.className = 'chip';
+      if (c.dataset.level === activeLevel) {
+        if (activeLevel === 'all') c.classList.add('active-all');
+        else if (activeLevel === 'intermediate') c.classList.add('active-int');
+        else if (activeLevel === 'advanced') c.classList.add('active-adv');
+        else if (activeLevel === 'elite') c.classList.add('active-eli');
+      }
+    });
+    render();
+  });
+});
+
+bodyChips.forEach(chip => {
+  chip.addEventListener('click', () => {
+    activeBody = chip.dataset.body;
+    bodyChips.forEach(c => {
+      c.className = 'chip';
+      if (c.dataset.body === activeBody) c.classList.add('active-body');
+    });
+    render();
+  });
+});
+
+searchInput.addEventListener('input', e => {
+  searchQuery = e.target.value;
+  render();
+});
+
+// init
+document.querySelector('[data-body="all"]').classList.add('active-body');
+render();
+</script>
+</body>
+</html>
